@@ -52,7 +52,6 @@
      <Compile Include="Assets\UsefulStuff\MeshCreationHelper.cs" />
      <Compile Include="Assets\init_level1.cs" />
      <None Include="Assets\Logs\vert.txt" />
-     <None Include="Assets\Rust\Nobiax Free Textures 13 &amp; 14.txt" />
      <None Include="Assets\Logs\ship_rotation.txt" />
      <None Include="Assets\Rusted Metal Plate Textures\Readme.txt.txt" />
      <None Include="Assets\Logs\MeshTest.txt" />

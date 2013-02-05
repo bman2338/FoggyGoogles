@@ -4,134 +4,107 @@ using SecretSauce;
 public class PlayerShip : MonoBehaviour {
 	
 	Mesh shipMesh {get;set;}
-	// Use this for initialization
 	//Pipe width = roughly 3.5
 
 	private Vector3 lastPull;
 	private Vector3 lastForward;
 	private float lastAmnt;
-	//for the second ray trace to find the spine of the track
 	private Vector3 NO_HIT = new Vector3(999999,999999,999999);
 	private float SEARCH_INC = .1f;
 	private Vector3 center = Vector3.zero;
 	
 	private Vector3 ip;
-	//transform.TransformDirection(normalFromMesh)
+	
 	void Start () {
-		
-		
-		
-		
 	}
 
 	void Update () {
 	
-
-		
-		Debug.Log ("Euler's test y:" + transform.localRotation);
 	
 
 		if (Input.GetKey("left")) {
 			transform.Rotate(new Vector3(0f,0,-1.0f));
-		
 			
 		}
 		
 		if (Input.GetKey("right")) {
 			transform.Rotate(new Vector3(0f,0,1.0f));
-			
 		}
 		
-	
-		float maxVelocity = 4.3f;
-	
-		var v = rigidbody.velocity;
-		if(v.magnitude > maxVelocity){
-			rigidbody.velocity = Vector3.ClampMagnitude(v,maxVelocity);
-			
-		}
 		//strafe
+		//SEE: http://answers.unity3d.com/questions/173817/how-to-rotate-a-car-smoothly.html
 		if(Input.GetKeyDown ("a")){
-			//transform.RotateAround(new Vector3());	
 			//ChangeLane(transform, 5, 1);
-			var rot = transform.rotation;
-			rot.y = rot.y - 10.0f;
-			transform.rotation = rot;
-			
 		}
 		if(Input.GetKeyDown ("d")){
-			//transform.RotateAround(new Vector3());	
 			//ChangeLane(transform, -5, 1);
-			
-			var rot = transform.rotation;
-			rot.y = 200.0f;
-			transform.rotation = rot;
+		
 		}
 	}
 	
-	private bool changing  = false;
-	private float turn =  2.0f;
-	
-	void ChangeLane(Transform ship, float angle, float time){
-		float t;
-		float bank;
-		if(changing) return;
-		changing = true;
-		for(t = 0; t < 1;){
-			t+= 2*Time.deltaTime/time;
-			turn = Mathf.Lerp (turn,angle,t);
-			
-			bank = 0.5f * turn;
-			ship.localEulerAngles = new Vector3(bank,0,turn);
-			return;
-		}
-		for(t = 0;t < 1;){
-			t += 2* Time.deltaTime/time;
-			turn = Mathf.Lerp (turn, 0, t);
-			bank = 0.5f * turn;
-			ship.localEulerAngles = new Vector3(turn,0,bank);
-			return;
-		}
-		changing = false;
-	}
+
 	
 	
 	void FixedUpdate ()
 	{
 		RaycastHit hitinfo;
-		Vector3 hitPoint = NO_HIT;
-		float hoverHeight = .001f;
 		if(Physics.Raycast(transform.position,-transform.forward,out hitinfo)){
-			var amnt = Mathf.Max (1.0f,hitinfo.distance);
+			
+			/**
+			 * float hoverHeight = .001f;
+			 * SEE: http://answers.unity3d.com/questions/173817/how-to-rotate-a-car-smoothly.html
 			var idealPosition = transform.position + 
 				((hoverHeight-hitinfo.distance) * transform.forward);
 			var pull = (idealPosition - transform.position);
-			
-			transform.rigidbody.AddForce(-hitinfo.normal * (9800 * amnt * amnt * amnt));
-			//transform.forward = hitinfo.normal;
-			Debug.Log ("Forward:" + transform.forward);
 			ip = idealPosition;
-			hitPoint = hitinfo.point;
-			lastPull = pull;
+			*/
+			//lastPull = pull;
+			
+			var amnt = hitinfo.distance * 5;
+			amnt = amnt * amnt;
 			lastForward = hitinfo.normal;
 			lastAmnt = amnt;
+			
+			
+			//push up from the track to hover...
+			//transform.rigidbody.AddForce( hitinfo.normal * (60 / Mathf.Max(0.15f,hitinfo.distance)));
+			
+			//push down for gravity
+			transform.rigidbody.AddForce(-hitinfo.normal * ( 16000));
+			
 		}
 		else{
-			transform.rigidbody.AddForce(-lastForward * (9800 * lastAmnt * lastAmnt * lastAmnt));
+			transform.rigidbody.AddForce(-lastForward * ( 16000));
+			//transform.rigidbody.AddForce( lastForward * (60 / Mathf.Max(0.15f,hitinfo.distance)));
 		}
 		
 	    if (Input.GetKey("up")) {
-			rigidbody.AddForce(transform.up* 6400);
+			rigidbody.AddForce(transform.up* 12400);
 		}
 		if (Input.GetKey("down")) {
-			rigidbody.AddForce(-transform.up * 6400);
+			rigidbody.AddForce(-transform.up * 12400);
+		}
+		
+		
+		float maxVelocity = 5.3f;
+	
+		var v = rigidbody.velocity;
+		if(v.magnitude > maxVelocity){
+			rigidbody.velocity = Vector3.ClampMagnitude(v,maxVelocity);
 		}
 		
 	}
 	void LateUpdate(){
-		//transform.position = ip;
+		
 	}
+	
+	
 	void OnCollisionEnter(Collision other){
-
+		return;
+		Debug.LogError("collide!");
+		if(other.gameObject.tag == "pipe"){
+			Debug.LogError("!");
+			return;	
+		}
 	}
 }
